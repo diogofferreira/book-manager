@@ -3,16 +3,7 @@ set_test = {'Diogo';'leticia';'ola';'Ana'};
 n=10;
 k=3;
 
-%% Initialize Filter
-
-bloom_filter = initialize(n);
-L=length(set_nomes);
-
-%% Insert 
-
-for i=1:L
-  bloom_filter=insert(bloom_filter,set_nomes{i},k);
-endfor
+bloom_filter= BloomFilter(n,k,set_nomes);
 
 %% Exists?
 
