@@ -1,4 +1,5 @@
 function [x]= HashFunction(str,size)
+  % P2 HashFunction (to be replaced for a better one)
   h=0;
   for i= 1:length(str)
     char=str(i)+33;

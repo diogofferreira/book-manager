@@ -1,10 +1,10 @@
 L=100;  % Set Length
-n=400;  % Filter Length
+n=800;  % Filter Length
 
 %%Generate Random String Array
 set_string = unique(cellstr(RandomString(40,L)));
 
-%%Generate New Random String Array
+%%Generate New Random String Array Different From The Previous
 set_test = unique(setdiff(cellstr(RandomString(40,L)),set_string));
 
 %% Calculate False Positives k= 1-15
@@ -24,4 +24,10 @@ for k=1:15
   count = 0;
 endfor
 
-plot(pFp,'-+g'),hold on,plot(tFp,'-+r');
+
+plot(pFp,'-+g');
+hold on;
+plot(tFp,'-+r');
+axis("tight");
+title("False Positive Probability");
+
