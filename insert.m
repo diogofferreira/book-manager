@@ -4,4 +4,4 @@ function bloom=insert(bloom,str,k)
     str= [str num2str(i)];
     bloom(HashFunction(str,L))=1;
   end  
-endfunction
+end

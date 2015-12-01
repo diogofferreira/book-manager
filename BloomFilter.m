@@ -6,6 +6,6 @@ function [bloom_filter] = BloomFilter (len,khash,sett)
   %% Insert Filter
   for i=1:length(sett)
     bloom_filter=insert(bloom_filter,sett{i},khash);
-  endfor
+  end
   
-endfunction
+end
