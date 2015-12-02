@@ -1,10 +1,11 @@
-L=100000;  % Set Length
-n=800000;  % Filter Length
+L=1e4;  % Set Length
+n=8e4;  % Filter Length
+
 
 %%Generate Random String Array
-set_string = unique(cellstr(RandomString(40,L)));
+set_string= arrayfun(@(i)(RandomString(40)), 1:L, 'UniformOutput', false);
 %%Generate New Random String Array Different From The Previous
-set_test = unique(setdiff(cellstr(RandomString(40,L)),set_string));
+set_test= unique(setdiff(arrayfun(@(i)(RandomString(40)), 1:L, 'UniformOutput', false),set_string));
 
 %% Calculate False Positives k= 1-15
 
