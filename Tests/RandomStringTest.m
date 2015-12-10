@@ -1,5 +1,5 @@
-L=1e4;  % Set Length
-n=8e4;  % Filter Length
+L=1e5;  % Set Length
+n=8e5;  % Filter Length
 
 wb=waitbar(0,'Computing ...');
 
@@ -15,7 +15,6 @@ tFp=zeros(1,15);
 pFp=zeros(1,15);
 count=0;
 for k=1:15
-  tic
   bloom_filter = BloomFilter(n,k,set_string);
   tFp(k)=(1-exp((-k*L)/(n)))^k;
   for i=1:L
@@ -26,7 +25,6 @@ for k=1:15
   pFp(k)=count/L;
   count = 0;
   wb=waitbar(k/15,wb,sprintf('Computing ... (K=%d)',k));
-  toc
 end
 close(wb);
 

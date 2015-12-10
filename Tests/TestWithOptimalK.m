@@ -1,5 +1,5 @@
-L=1e6;  % Set Length
-n=8e6;  % Filter Length
+L=1e5;  % Set Length
+n=8e5;  % Filter Length
 
 %%Find the Optimal value to K
 k=round(n/L * log(2));
@@ -10,7 +10,7 @@ set_string= RandomStringGenerator(40,L);
 %%Generate New Random String Cell Different From The Previous
 set_test= unique(setdiff(RandomStringGenerator(40,L),set_string));
 
-%% Calculate False Positives k= 1-15
+%% Calculate False Positives
 
 tFp=0;
 pFp=0;
@@ -25,5 +25,6 @@ for i=1:L
 end
 pFp=count/L;
 
+fprintf('Optimal K = %d\n',k);
 fprintf('False Positive Probability(T) = %d\n',tFp);
 fprintf('False Positive Probability(P) = %d\n',pFp);

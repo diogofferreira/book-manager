@@ -1,5 +1,5 @@
 set_string = {'Filipa';'Leticia';'Ana';'Rita'};
-set_test = {'Diogo';'leticia';'ola';'Ana'};
+set_test = {'Diogo';'leticia';'Luis';'Ana'};
 n=100;
 k=3;
 

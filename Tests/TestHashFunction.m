@@ -2,6 +2,7 @@ L = 1e4;   % Set Length
 n = 8e4;   % Filter Length
 k = 6;     % HashFunctions number
 
+
 %%Generate Random String Cell
 set_string= RandomStringGenerator(40,L);
 
@@ -23,7 +24,7 @@ for i=1:L
     key= set_string{i};
     for j=1:k
         key=[key num2str(j)];
-        matrix1(i,j)= HashFunction2(key,n);
+        matrix1(i,j)= HashFunction3(key,n);
     end   
 end
 
@@ -33,8 +34,8 @@ for t=1:k
     tmp=ceil(k/2);
     subplot(2,tmp,t)
     plot(matrix(:,t));
-    t=sprintf('K = %g',t);
-    title(t);
+    ti=sprintf('K = %g',t);
+    title(ti);
 end
 
 
@@ -70,7 +71,7 @@ end
 
 figure
 bar3(correlation)
-title('Djb2 HashFunction'); 
+title('Djb2 HashFunction (L = 1e4; n = 8e4)'); 
 figure
 bar3(correlation1)
-title('P2 HashFunction'); 
+title('P2 HashFunction (L = 1e4; n = 8e4)'); 

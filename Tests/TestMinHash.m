@@ -6,21 +6,18 @@ k = 1000;
 coefA = coef_a_b(k);
 coefB = coef_a_b(k);
 
-%m = max(udata(:,2))%---retorna o maximo valor do filmes para assim escolhermos
-% o numero primo a seguir valor de c = 1693
-%m=1682;
+c = 94906001;
+N = 900000;
 
-c = 1693;
 
-tic
 Docs_signatures = zeros(Nu,k);
 for i = 1:Nu
     signature = zeros(1,k);
     for k = 1:1000
         min = 2000;
         for j = 1:length(Set{i})
-            %hash_code = mod(coefA(k) * Set{i}(j) + coefB(k),c); 
-            hash_code = HashFunction(num2str(Set{i}(j)),length(Set{i}));
+            hash_code = mod(mod(coefA(k) * Set{i}(j) + coefB(k),c),1682);
+            
             if hash_code < min
                 min = hash_code;
             end
@@ -29,7 +26,7 @@ for i = 1:Nu
     end
     Docs_signatures(i,:) = signature;
 end
-toc
+
 JDist=zeros(Nu);
 for n1 = 1:Nu% Get the MinHash signature for document i.
   signature1 = Docs_signatures(n1,:);
@@ -65,11 +62,4 @@ k= 1;
   end
 SimilarUsers
 
-        
-        
-% N=length(Set{2})
-% M=zeros(1,N);
-% for i=1:X
-%     M(1,i)=HashFunction(num2str(Set{2}(i)),X);
-% end
-% Sign2(1,k)=min(M)
+
