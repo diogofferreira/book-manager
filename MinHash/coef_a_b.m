@@ -1,5 +1,5 @@
 function [coef] = coef_a_b(k)
-    m=1682; % Gamma
+    m=168200000; % Gamma
     coef = zeros(1,k); %Create a list of 'k' random values.
 
     while k > 0
