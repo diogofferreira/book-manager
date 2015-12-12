@@ -1,5 +1,5 @@
 %% Get Data
-tic
+
 [titles,ratings,usersNames]= ReadData();
 
 %% Insert Book Names into Bloom Filter
@@ -16,15 +16,18 @@ tic
 %% Computing Jaccard Distances
 
 
-
 k = 1000;
 coefA = coef_a_b(k);
 coefB = coef_a_b(k);
 
 c = 94906001;
 N = 900000;
+
+%Get Books by Users
 [Set,users] = usersBooks(ratings);
 Nu = length(users);
+
+
 Books_signatures = zeros(Nu,k);
 
 wb=waitbar(0,'Computing Signatures ...');
@@ -90,7 +93,7 @@ for n1= 1:Nu,
     end
     waitbar(n1/Nu,wb);
 end
-toc
+
 close(wb);
 SimilarUsers
 

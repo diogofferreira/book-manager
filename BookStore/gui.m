@@ -58,25 +58,31 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-%% Read Data
+%% Read and Slice Data
 
-[titles,ratings,users]=ReadData();
+[handles.titless,ratings,users] = ReadData();
 
+[handles.Set] = usersBooks(ratings);
 %% Insert Book Names into Bloom Filter
-titles(1:1000,2)
-L= length(titles);
+titles = handles.titless(1:1e4,:);
+L = length(titles);
 
-%% Find Optimal P, N and K
-p = 1e-5; % False Positives Probability
-n = ceil((L*log(1/p))/log(2)^2); %Bloom Filter Length
-handles.k = round(n/L * log(2)); %HashFunctions Length
+% Find Optimal P, N and K
+p = 1e-4;                        % False Positives Probability
+n = ceil((L*log(1/p))/log(2)^2); % Bloom Filter Length
+handles.k = round(n/L * log(2)); % HashFunctions Length
 
+tic
+handles.bloom = BloomFilter(n,handles.k,titles(:,2));
+toc
 
-handles.bloom = BloomFilter(n,handles.k,titles(1:1000,2));
 c = cellfun(@(x)str2double(x), users(1:1000,1));
 set(handles.listbox1,'String',sort(titles(:,2)));
 set(handles.listbox2,'String',c);
+handles.titles=titles;
 guidata(hObject, handles);
+
+
 % UIWAIT makes gui wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
@@ -100,7 +106,16 @@ function listbox1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
-
+bu = handles;
+titles = sort(handles.titless(1:1e4,:));
+if strcmp(get(gcf,'selectiontype'),'open')
+   seltype = titles{get(hObject,'Value'),2};
+   idx = find(ismember(handles.titless(:,2),seltype))
+   figure
+   imshow(imread(handles.titless{idx(1),3},'jpg')); 
+end
+handles= bu;
+guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
 function listbox1_CreateFcn(hObject, eventdata, handles)
@@ -123,6 +138,20 @@ function listbox2_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox2
+Set= handles.Set;
+z=[];
+if strcmp(get(gcf,'selectiontype'),'open')
+   seltype = get(gcbo,'value');
+   x = Set{seltype};
+   for i=1:length(x)
+       idx=find(ismember(handles.titless(:,1),x(i)));
+       for j=1:length(idx)
+            z=[z handles.titless(idx(j),2)];
+       end
+   end
+end
+set(handles.listbox1,'String',z);
+guidata(hObject, handles);
 
 
 % --- Executes during object creation, after setting all properties.
@@ -166,11 +195,11 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
- val = get(handles.edit1,'String');
- val=val{1};
- if (isMember(handles.bloom,val,handles.k))
-    msgbox('It is very likely that the book exists');
- else
-     msgbox('The book definitely does not exist');
- end
+    val = get(handles.edit1,'String');
+    val=val{1};
+    if (isMember(handles.bloom,val,handles.k))
+        msgbox('It is very likely that the book exists');
+    else
+        msgbox('The book definitely does not exist');
+end
  
