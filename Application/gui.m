@@ -1,30 +1,4 @@
 function varargout = gui(varargin)
-% GUI MATLAB code for gui.fig
-%      GUI, by itself, creates a new GUI or raises the existing
-%      singleton*.
-%
-%      H = GUI returns the handle to a new GUI or the handle to
-%      the existing singleton*.
-%
-%      GUI('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in GUI.M with the given input arguments.
-%
-%      GUI('Property','Value',...) creates a new GUI or raises the
-%      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before gui_OpeningFcn gets called.  An
-%      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to gui_OpeningFcn via varargin.
-%
-%      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
-%      instance to run (singleton)".
-%
-% See also: GUIDE, GUIDATA, GUIHANDLES
-
-% Edit the above text to modify the response to help gui
-
-% Last Modified by GUIDE v2.5 10-Dec-2015 23:58:47
-
-% Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -60,11 +34,12 @@ guidata(hObject, handles);
 
 %% Read and Slice Data
 
-[handles.titless,ratings,users] = ReadData();
+[titles,ratings,users] = ReadData();
+handles.titles= titles(1:5e4,:);
+[handles.Set,users1000] = usersBooks(ratings);
 
-[handles.Set] = usersBooks(ratings);
+Set = handles.Set;
 %% Insert Book Names into Bloom Filter
-titles = handles.titless(1:1e4,:);
 L = length(titles);
 
 % Find Optimal P, N and K
@@ -72,14 +47,90 @@ p = 1e-4;                        % False Positives Probability
 n = ceil((L*log(1/p))/log(2)^2); % Bloom Filter Length
 handles.k = round(n/L * log(2)); % HashFunctions Length
 
-tic
-handles.bloom = BloomFilter(n,handles.k,titles(:,2));
-toc
 
-c = cellfun(@(x)str2double(x), users(1:1000,1));
-set(handles.listbox1,'String',sort(titles(:,2)));
+handles.bloom = BloomFilter(n,handles.k,handles.titles(:,2));
+
+
+%c = cellfun(@(x)str2double(x), users(8000:9000,1));
+c = cellfun(@(x)str2double(x), users1000);
+set(handles.listbox1,'String',sort(handles.titles(:,2)));
 set(handles.listbox2,'String',c);
-handles.titles=titles;
+%% Computing Jaccard Distances
+Nu = length(users1000);
+
+k = 1000;
+coefA = coef_a_b_books(k);
+coefB = coef_a_b_books(k);
+
+N=271379000000;%nº de livros multiplicado por uma potência de 10
+p=271379000033;%primo maior que N
+
+
+Books_signatures = zeros(2,k);
+
+wb=waitbar(0,'Computing Signatures ...');
+for i = 1:Nu
+    signature = zeros(1,k);
+    for t = 1:k
+        min = N + 1;
+        
+        for j = 1:length(Set{i})
+            string2hash = HashFunction(Set{i}{j},N);
+            hash_code = mod(mod(coefA(t) * string2hash + coefB(t),p),N);
+            
+            if hash_code < min
+                min = hash_code;
+            end
+        end
+        signature(1,t) = min;
+    end
+    Books_signatures(i,:) = signature;
+    waitbar(i/Nu,wb);
+end
+close(wb);
+
+wb=waitbar(0,'Computing Distances ...');
+%Nu=2;
+JDist=zeros(Nu);
+for n1 = 1:Nu% Get the MinHash signature for document i.
+  signature1 = Books_signatures(n1,:);
+    
+  %For each of the other test documents...
+  for n2= n1+1:Nu
+    
+    % Get the MinHash signature for document j.
+    signature2 = Books_signatures(n2,:);
+    
+    count = 0;
+    %Count the number of positions in the minhash signature which are equal.
+    
+    for k = 1:1000
+      count = count + (signature1(k) == signature2(k));
+    
+    % Record the percentage of positions which matched.    
+    end
+     JDist(n1,n2) = 1-(count / k);
+  end
+  waitbar(n1/Nu);
+end
+close(wb);
+
+wb=waitbar(0,'Paring Signatures ...');
+threshold =0.5;  % limiar de decisao
+% Array para guardar pares similares (user1, user2, distancia)
+handles.SimilarUsers= zeros(1,3);
+k= 1;
+  for n1= 1:Nu,
+  for n2= n1+1:Nu,
+    if (JDist(n1,n2)<threshold)
+      handles.SimilarUsers(k,:)= [str2double(users1000{n1}) str2double(users1000{n2}) JDist(n1,n2)];
+      %fprintf('%-10d        %-10d        %-.5f\n',str2double(users1000{n1}),str2double(users1000{n2}),JDist(n1,n2))
+      k= k+1;
+    end
+  end
+  waitbar(n1/Nu,wb);
+  end
+ close(wb);
 guidata(hObject, handles);
 
 
@@ -106,15 +157,14 @@ function listbox1_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox1
-bu = handles;
-titles = sort(handles.titless(1:1e4,:));
 if strcmp(get(gcf,'selectiontype'),'open')
-   seltype = titles{get(hObject,'Value'),2};
-   idx = find(ismember(handles.titless(:,2),seltype))
+   seltype = get(handles.listbox1,'String');
+   seltype = seltype{get(handles.listbox1,'Value')};
+   idx = find(ismember(handles.titles(:,2),seltype));
    figure
-   imshow(imread(handles.titless{idx(1),3},'jpg')); 
+   handles.titles{idx(1),3}
+   imshow(imread(handles.titles{idx(1),3},'jpg')); 
 end
-handles= bu;
 guidata(hObject, handles);
 
 % --- Executes during object creation, after setting all properties.
@@ -138,19 +188,18 @@ function listbox2_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from listbox2
-Set= handles.Set;
 z=[];
 if strcmp(get(gcf,'selectiontype'),'open')
    seltype = get(gcbo,'value');
-   x = Set{seltype};
+   x = handles.Set{seltype};
    for i=1:length(x)
-       idx=find(ismember(handles.titless(:,1),x(i)));
+       idx=find(ismember(handles.titles(:,1),x(i)));
        for j=1:length(idx)
-            z=[z handles.titless(idx(j),2)];
+            z=[z handles.titles(idx(j),2)];
        end
    end
 end
-set(handles.listbox1,'String',z);
+set(handles.listbox1,'String',sort(z));
 guidata(hObject, handles);
 
 
@@ -201,5 +250,23 @@ function pushbutton1_Callback(hObject, eventdata, handles)
         msgbox('It is very likely that the book exists');
     else
         msgbox('The book definitely does not exist');
-end
- 
+    end
+
+
+
+% --- Executes on button press in pushbutton2.
+function pushbutton2_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton2 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+varargout = guiSimilar(figure(guiSimilar));
+H = findall(0,'tag','listbox1Similar');
+set(H,'string',num2str(handles.SimilarUsers()));
+
+
+% --- Executes on button press in pushbutton3.
+function pushbutton3_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.listbox1,'String',sort(handles.titles(:,2)));
