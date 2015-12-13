@@ -162,7 +162,6 @@ if strcmp(get(gcf,'selectiontype'),'open')
    seltype = seltype{get(handles.listbox1,'Value')};
    idx = find(ismember(handles.titles(:,2),seltype));
    figure
-   handles.titles{idx(1),3}
    imshow(imread(handles.titles{idx(1),3},'jpg')); 
 end
 guidata(hObject, handles);
@@ -199,9 +198,8 @@ if strcmp(get(gcf,'selectiontype'),'open')
        end
    end
 end
-set(handles.listbox1,'String',sort(z));
-guidata(hObject, handles);
-
+set(handles.listbox1,'String',sort(z),'Value',1);
+guidata(hObject, handles); 
 
 % --- Executes during object creation, after setting all properties.
 function listbox2_CreateFcn(hObject, eventdata, handles)
@@ -268,5 +266,5 @@ set(H,'string',num2str(handles.SimilarUsers()));
 function pushbutton3_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    structure with handles and user data (see GUIDATA) 
 set(handles.listbox1,'String',sort(handles.titles(:,2)));

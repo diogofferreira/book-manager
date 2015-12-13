@@ -1,4 +1,6 @@
 function [Book_Titles,Book_Ratings,Book_Users] = ReadData()
+    % Disable Matlab Warning
+    warning('off', 'MATLAB:table:ModifiedVarnames');
     
     %% Slice Data
     wb=waitbar(0,'Fetching Data ...');
