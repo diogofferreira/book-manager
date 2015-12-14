@@ -1,7 +1,7 @@
 function [Set,users]=usersBooks(ratings)
 
     users = unique(ratings(:,1));     % Users List
-    users = users(1:1000);            % Choose Just 1000 Users 
+    users = users(1:1000);         % Choose Just 1000 Users 
     Nu = length(users);               % Users Size
     
     Set=cell(Nu,1);                   % Books by User
