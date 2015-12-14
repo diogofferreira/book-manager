@@ -22,7 +22,6 @@
 
 # Ignore all png files except the ones residing in the 
 # signals subdirectory
-*.png
 !/signals/*.png
 
 # Ignore temporaty files
