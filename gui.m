@@ -150,8 +150,13 @@ if strcmp(get(gcf,'selectiontype'),'open')
    seltype = get(handles.listbox1,'String');
    seltype = seltype{get(handles.listbox1,'Value')};
    idx = find(ismember(handles.titles(:,2),seltype));
-   figure
-   imshow(imread(handles.titles{idx(1),3},'jpg')); 
+   % When the Image is Empty, Show an Error Image
+   try
+      figure
+      imshow(imread(handles.titles{idx(1),3},'jpg'));
+   catch ME
+       imshow(imread('unavailable','png'));
+   end
 end
 guidata(hObject, handles);
 
@@ -166,17 +171,21 @@ end
 function listbox2_Callback(hObject, eventdata, handles)
 %% Show Ratings of each User
 z=[];
-if strcmp(get(gcf,'selectiontype'),'open')
-   seltype = get(gcbo,'value');
-   x = handles.Set{seltype};
-   for i=1:length(x)
-       idx=find(ismember(handles.titles(:,1),x(i)));
-       for j=1:length(idx)
-            z=[z handles.titles(idx(j),2)];
-       end
+seltype = get(gcbo,'value');
+x = handles.Set{seltype};
+for i=1:length(x)
+   idx=find(ismember(handles.titles(:,1),x(i)));
+   for j=1:length(idx)
+        z=[z handles.titles(idx(j),2)];
    end
 end
-set(handles.listbox1,'String',sort(z),'Value',1);
+% When the Book doesnt exists, Show an Default String
+if(length(z)<1)
+    z = '*** Unavailable Books ***';
+else
+    z = sort(z);
+end
+set(handles.listbox1,'String',z,'Value',1);
 guidata(hObject, handles); 
 
 
