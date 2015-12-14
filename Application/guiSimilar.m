@@ -51,3 +51,23 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
 end
 
 function pushbutton1_Callback(hObject, eventdata, handles)
+
+
+function listbox2Similar_Callback(hObject, eventdata, handles)
+
+
+function listbox2Similar_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+function listbox3Similar_Callback(hObject, eventdata, handles)
+
+function listbox3Similar_CreateFcn(hObject, eventdata, handles)
+
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end

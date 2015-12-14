@@ -217,8 +217,12 @@ function pushbutton2_Callback(hObject, eventdata, handles)
 
 %% Open Similar Users Windows
 varargout = guiSimilar(figure(guiSimilar));
-H = findall(0,'tag','listbox1Similar');
-set(H,'string',num2str(handles.SimilarUsers()));
+a = findall(0,'tag','listbox1Similar');
+b = findall(0,'tag','listbox2Similar');
+c = findall(0,'tag','listbox3Similar');
+set(a,'string',num2str(handles.SimilarUsers(:,1)));
+set(b,'string',num2str(handles.SimilarUsers(:,2)));
+set(c,'string',num2str(handles.SimilarUsers(:,3)));
 
 function pushbutton3_Callback(hObject, eventdata, handles)
 
