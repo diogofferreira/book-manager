@@ -1,4 +1,6 @@
 function varargout = gui(varargin)
+
+%% Initialization Code
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
@@ -15,22 +17,24 @@ if nargout
 else
     gui_mainfcn(gui_State, varargin{:});
 end
-% End initialization code - DO NOT EDIT
 
-
-% --- Executes just before gui is made visible.
 function gui_OpeningFcn(hObject, eventdata, handles, varargin)
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to gui (see VARARGIN)
 
 % Choose default command line output for gui
 handles.output = hObject;
 
 % Update handles structure
 guidata(hObject, handles);
+
+%% Set a Background Image
+% create an axes that spans the whole gui
+ah = axes('unit', 'normalized', 'position', [0 0 1 1]); 
+% import the background image and show it on the axes
+bg = imread('bg.jpg'); imagesc(bg);
+% prevent plotting over the background and turn the axis off
+set(ah,'handlevisibility','off','visible','off')
+% making sure the background is behind all the other uicontrols
+uistack(ah, 'bottom');
 
 %% Read and Slice Data
 
@@ -42,20 +46,23 @@ Set = handles.Set;
 %% Insert Book Names into Bloom Filter
 L = length(titles);
 
-% Find Optimal P, N and K
+%% Find Optimal P, N and K
 p = 1e-4;                        % False Positives Probability
 n = ceil((L*log(1/p))/log(2)^2); % Bloom Filter Length
 handles.k = round(n/L * log(2)); % HashFunctions Length
 
+%% Insert Set into Bloom Filter
 
 handles.bloom = BloomFilter(n,handles.k,handles.titles(:,2));
 
+%% Set Listbox Data
 
-%c = cellfun(@(x)str2double(x), users(8000:9000,1));
 c = cellfun(@(x)str2double(x), users1000);
 set(handles.listbox1,'String',sort(handles.titles(:,2)));
 set(handles.listbox2,'String',c);
+
 %% Computing Jaccard Distances
+
 Nu = length(users1000);
 
 k = 1000;
@@ -124,7 +131,6 @@ k= 1;
   for n2= n1+1:Nu,
     if (JDist(n1,n2)<threshold)
       handles.SimilarUsers(k,:)= [str2double(users1000{n1}) str2double(users1000{n2}) JDist(n1,n2)];
-      %fprintf('%-10d        %-10d        %-.5f\n',str2double(users1000{n1}),str2double(users1000{n2}),JDist(n1,n2))
       k= k+1;
     end
   end
@@ -133,30 +139,13 @@ k= 1;
  close(wb);
 guidata(hObject, handles);
 
-
-% UIWAIT makes gui wait for user response (see UIRESUME)
-% uiwait(handles.figure1);
-
-
-% --- Outputs from this function are returned to the command line.
 function varargout = gui_OutputFcn(hObject, eventdata, handles) 
-% varargout  cell array for returning output args (see VARARGOUT);
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Get default command line output from handles structure
 varargout{1} = handles.output;
 
 
-% --- Executes on selection change in listbox1.
 function listbox1_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox1 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox1
+%% Show Books Cover Image
 if strcmp(get(gcf,'selectiontype'),'open')
    seltype = get(handles.listbox1,'String');
    seltype = seltype{get(handles.listbox1,'Value')};
@@ -166,27 +155,16 @@ if strcmp(get(gcf,'selectiontype'),'open')
 end
 guidata(hObject, handles);
 
-% --- Executes during object creation, after setting all properties.
-function listbox1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+function listbox1_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
 
-% --- Executes on selection change in listbox2.
-function listbox2_Callback(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns listbox2 contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from listbox2
+function listbox2_Callback(hObject, eventdata, handles)
+%% Show Ratings of each User
 z=[];
 if strcmp(get(gcf,'selectiontype'),'open')
    seltype = get(gcbo,'value');
@@ -201,70 +179,39 @@ end
 set(handles.listbox1,'String',sort(z),'Value',1);
 guidata(hObject, handles); 
 
-% --- Executes during object creation, after setting all properties.
-function listbox2_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to listbox2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
-% Hint: listbox controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
+function listbox2_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
-
 
 
 function edit1_Callback(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-% Hints: get(hObject,'String') returns contents of edit1 as text
-%        str2double(get(hObject,'String')) returns contents of edit1 as a double
 
 
-% --- Executes during object creation, after setting all properties.
 function edit1_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
-
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
 
 
-% --- Executes on button press in pushbutton1.
 function pushbutton1_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton1 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+%% Search for Book in the Dataset
     val = get(handles.edit1,'String');
-    val=val{1};
     if (isMember(handles.bloom,val,handles.k))
         msgbox('It is very likely that the book exists');
     else
         msgbox('The book definitely does not exist');
     end
 
-
-
-% --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton2 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+
+%% Open Similar Users Windows
 varargout = guiSimilar(figure(guiSimilar));
 H = findall(0,'tag','listbox1Similar');
 set(H,'string',num2str(handles.SimilarUsers()));
 
-
-% --- Executes on button press in pushbutton3.
 function pushbutton3_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA) 
+
+%% Show the Initial Book List
 set(handles.listbox1,'String',sort(handles.titles(:,2)));

@@ -1,5 +1,4 @@
 %% Get Data
-
 [titles,ratings,users]= ReadData();
 
 %% Insert Book Names into Bloom Filter

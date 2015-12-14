@@ -1,5 +1,5 @@
 %% Initial Values
-L=2e5;  % Set Length
+L=1e5;  % Set Length
 p= 0.0001; %Probability
 
 %% Find Optimal Value to N 
@@ -31,6 +31,7 @@ for i=1:L
 end
 pFp=count/L;
 
+%% Conclusion
 
 fprintf('Optimal N = %d\n',n);
 fprintf('Optimal K = %d\n',k);

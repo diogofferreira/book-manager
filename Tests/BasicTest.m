@@ -9,7 +9,6 @@ bloom_filter= BloomFilter(n,k,set_string);
 
 %% Test Membership
 
-
 % The Inserted Set
 
 for i=1:length(set_string)
@@ -38,5 +37,6 @@ end
 pFpT=((1-exp((-k*4)/(n)))^k);
 pFpP=fp/length(set_test);
 
+%% Conclusions
 fprintf('False Positives (T) = %g\n',pFpT);
 fprintf('False Positives (P) = %g\n',pFpP);

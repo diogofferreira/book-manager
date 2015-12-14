@@ -24,7 +24,7 @@ for i=1:L
     key= set_string{i};
     for j=1:k
         key=[key num2str(j)];
-        matrix1(i,j)= HashFunction3(key,n);
+        matrix1(i,j)= HashFunction2(key,n);
     end   
 end
 
