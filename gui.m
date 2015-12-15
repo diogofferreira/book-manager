@@ -80,11 +80,9 @@ for i = 1:Nu
     signature = zeros(1,k);
     for t = 1:k
         min = N + 1;
-        
         for j = 1:length(Set{i})
             string2hash = HashFunction(Set{i}{j},N);
             hash_code = mod(mod(coefA(t) * string2hash + coefB(t),p),N);
-            
             if hash_code < min
                 min = hash_code;
             end
