@@ -27,6 +27,8 @@ pFp=count/L;
 
 %% Conclusion
 
+fprintf('Set Length = %d\n',L);
+fprintf('Filter  Length = %d\n',n);
 fprintf('Optimal K = %d\n',k);
 fprintf('False Positive Probability(T) = %d\n',tFp);
 fprintf('False Positive Probability(P) = %d\n',pFp);

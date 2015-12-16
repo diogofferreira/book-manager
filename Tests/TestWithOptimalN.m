@@ -20,9 +20,7 @@ tFp=0;
 pFp=0;
 count=0;
 
-tic
 bloom_filter = BloomFilter(n,k,set_string);
-toc
 tFp=(1-exp((-k*L)/(n)))^k;
 for i=1:L
     if(isMember(bloom_filter,set_test{i},k))
@@ -33,7 +31,7 @@ pFp=count/L;
 
 %% Conclusion
 
+fprintf('Set Length = %d\n',L);
+fprintf('Chosen Probabilty = %d\n',p);
 fprintf('Optimal N = %d\n',n);
 fprintf('Optimal K = %d\n',k);
-fprintf('False Positive Probability(T) = %d\n',tFp);
-fprintf('False Positive Probability(P) = %d\n',pFp);

@@ -110,7 +110,7 @@ for n1 = 1:Nu
     count = 0;
    
     for k = 1:1000
-      count = count + (signature1(k) == signature2(k)); %Record thehashfunctions that agree
+      count = count + (signature1(k) == signature2(k)); %Record the Hash Functions that agree
     
     % Record distance    
     end
@@ -121,6 +121,7 @@ end
 close(wb);
 
 %% Find Similar Users
+
 wb=waitbar(0,'Paring Signatures ...');
 threshold =0.5;  % limit
 % Arrayto save simiar pairs (user1, user2, distance)
