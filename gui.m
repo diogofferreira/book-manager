@@ -26,7 +26,7 @@ handles.output = hObject;
 % Update handles structure
 guidata(hObject, handles);
 
-%% Set a Background Image
+%% Set a Background Image (based on http://stackoverflow.com/questions/13101661/how-to-put-a-background-image-in-a-figure-using-matlab-guide)
 % create an axes that spans the whole gui
 ah = axes('unit', 'normalized', 'position', [0 0 1 1]); 
 % import the background image and show it on the axes
@@ -66,13 +66,14 @@ set(handles.listbox2,'String',c);
 Nu = length(users1000);
 
 k = 1000;
-coefA = coef_a_b_books(k);
-coefB = coef_a_b_books(k);
+coefA = coef_a_b_books(k); % k A coeficient to use in universal hashfunction
+coefB = coef_a_b_books(k); % k B coeficient to use in universal hashfunction
 
-N=271379000000;%nº de livros multiplicado por uma potência de 10
-p=271379000033;%primo maior que N
+N=271379000000; %Number of users times a 10 power to make the range of buckets
+                %way big to avoid colisions 
+p=271379000033; %Prime number bigger than N
 
-
+%% Get Signatures for each User
 Books_signatures = zeros(2,k);
 
 wb=waitbar(0,'Computing Signatures ...');
@@ -87,32 +88,31 @@ for i = 1:Nu
                 min = hash_code;
             end
         end
-        signature(1,t) = min;
+        signature(1,t) = min; %Save minimum value hashed
     end
-    Books_signatures(i,:) = signature;
+    Books_signatures(i,:) = signature; %Save signature of user
     waitbar(i/Nu,wb);
 end
 close(wb);
 
 wb=waitbar(0,'Computing Distances ...');
-%Nu=2;
+
 JDist=zeros(Nu);
-for n1 = 1:Nu% Get the MinHash signature for document i.
+for n1 = 1:Nu
   signature1 = Books_signatures(n1,:);
     
-  %For each of the other test documents...
+  
   for n2= n1+1:Nu
     
-    % Get the MinHash signature for document j.
+    
     signature2 = Books_signatures(n2,:);
     
     count = 0;
-    %Count the number of positions in the minhash signature which are equal.
-    
+   
     for k = 1:1000
-      count = count + (signature1(k) == signature2(k));
+      count = count + (signature1(k) == signature2(k)); %Record thehashfunctions that agree
     
-    % Record the percentage of positions which matched.    
+    % Record distance    
     end
      JDist(n1,n2) = 1-(count / k);
   end
@@ -120,9 +120,10 @@ for n1 = 1:Nu% Get the MinHash signature for document i.
 end
 close(wb);
 
+%% Find Similar Users
 wb=waitbar(0,'Paring Signatures ...');
-threshold =0.5;  % limiar de decisao
-% Array para guardar pares similares (user1, user2, distancia)
+threshold =0.5;  % limit
+% Arrayto save simiar pairs (user1, user2, distance)
 handles.SimilarUsers= zeros(1,3);
 k= 1;
   for n1= 1:Nu,

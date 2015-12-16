@@ -1,9 +1,9 @@
 function SimilarUsers=findSimilar(distJ,threshold,ids)
-%%  Com base na distancia, determina pares com distancia inferior a um limiar pre-definido
+%%  Based on distance finds similar pairs bellow a limit
 Nu=length(ids);
-threshold = 0.4;  % limiar de decisao
-% Array para guardar pares similares (user1, user2, distancia)
-SimilarUsers= zeros(1,3);
+threshold = 0.4;  % limit
+
+SimilarUsers= zeros(1,3);% Array to savesimilar pairs (user1, user2, distance)
 k= 1;
 h = waitbar(0,'Calculating Similars');
 for n1= 1:Nu,
